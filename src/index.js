@@ -215,4 +215,4 @@ const QRScanner = {
   },
 };
 
-Object.assign(window.QRScanner, QRScanner);
+export default QRScanner;
