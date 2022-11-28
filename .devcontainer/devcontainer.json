@@ -1,0 +1,13 @@
+{
+  "dockerComposeFile": "compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+		"ms-vscode.cpptools-extension-pack",
+		"esbenp.prettier-vscode"
+	]
+    }
+  }
+}

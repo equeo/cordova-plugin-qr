@@ -1,0 +1,17 @@
+services:
+  dev:
+    image: localhost/eqmod-ts-authservice/dev
+    container_name: eqmod-ts-authservice_dev
+    build:
+      context: .
+      dockerfile: "Containerfile"
+    volumes:
+      - "../:/workspace"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    privileged: true
+    env_file: ".env"
+    entrypoint: /entrypoint.sh
