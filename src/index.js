@@ -216,5 +216,3 @@ const QRScanner = {
 };
 
 window.QRScanner = QRScanner;
-
-export default QRScanner;
