@@ -215,4 +215,6 @@ const QRScanner = {
   },
 };
 
+console.log(QRScanner)
+
 window.QRScanner = QRScanner;
