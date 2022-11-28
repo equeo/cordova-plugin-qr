@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/equeo/cordova-plugin-qrscanner"
+    "url": "https://github.com/equeo/cordova-plugin-qr"
   },
   "keywords": [
     "ecosystem:cordova",
@@ -18,9 +18,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/equeo/cordova-plugin-qrscanner/issues"
+    "url": "https://github.com/equeo/cordova-plugin-qr/issues"
   },
-  "homepage": "https://github.com/equeo/cordova-plugin-qrscanner",
+  "homepage": "https://github.com/equeo/cordova-plugin-qr",
   "devDependencies": {
     "@babel/core": "^7.20.5",
     "@babel/preset-env": "^7.20.2",
