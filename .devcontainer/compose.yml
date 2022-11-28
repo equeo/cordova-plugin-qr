@@ -2,7 +2,7 @@ services:
   dev:
     build:
       context: .
-      dockerfile: "Containerfile"
+      dockerfile: Containerfile
     volumes:
       - "../:/workspace"
     ulimits:
@@ -11,5 +11,5 @@ services:
         soft: 20000
         hard: 40000
     privileged: true
-    env_file: ".env"
+    env_file: .env
     entrypoint: /entrypoint.sh
