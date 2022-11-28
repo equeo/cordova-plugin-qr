@@ -33,12 +33,9 @@ const convertStatus = (statusDictionary) => ({
 // plugin to force re-rendering immediately after the native webview background
 // is made transparent.
 const clearBackground = () => {
-  const body = document.body;
-  if (body.style) {
-    body.style.backgroundColor = "rgba(0,0,0,0.01)";
-    body.style.backgroundImage = "";
-    setTimeout(() => (body.style.backgroundColor = "transparent"), 1);
-  }
+  document.body.style.backgroundColor = "rgba(0,0,0,0.01)";
+  document.body.style.backgroundImage = "";
+  setTimeout(() => (document.body.style.backgroundColor = "transparent"), 1);
 };
 
 const errorCallback = (callback) => {
@@ -118,7 +115,6 @@ const successCallback = (callback) => {
 const doneCallback = (callback, clear) => {
   if (!callback) return null;
   return (statusDict) => {
-    if (clear) clearBackground();
     return callback(convertStatus(statusDict));
   };
 };
