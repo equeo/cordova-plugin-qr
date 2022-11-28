@@ -123,90 +123,94 @@ const doneCallback = (callback, clear) => {
   };
 };
 
-window.QRScanner = {};
+window.QRScanner = {
+  prepare: (callback) =>
+    cordova.exec(
+      successCallback(callback),
+      errorCallback(callback),
+      "QRScanner",
+      "prepare",
+      []
+    ),
 
-window.QRScanner.prepare = (callback) =>
-  cordova.exec(
-    successCallback(callback),
-    errorCallback(callback),
-    "QRScanner",
-    "prepare",
-    []
-  );
+  destroy: (callback) =>
+    cordova.exec(
+      doneCallback(callback, true),
+      null,
+      "QRScanner",
+      "destroy",
+      []
+    ),
 
-window.QRScanner.destroy = (callback) =>
-  cordova.exec(doneCallback(callback, true), null, "QRScanner", "destroy", []);
+  scan: (callback) => {
+    if (!callback) throw new Error("No callback provided to scan method.");
+    const success = (result) => callback(null, result);
+    cordova.exec(success, errorCallback(callback), "QRScanner", "scan", []);
+  },
 
-window.QRScanner.scan = (callback) => {
-  if (!callback) throw new Error("No callback provided to scan method.");
-  const success = (result) => callback(null, result);
-  cordova.exec(success, errorCallback(callback), "QRScanner", "scan", []);
-};
+  cancelScan: (callback) =>
+    cordova.exec(doneCallback(callback), null, "QRScanner", "cancelScan", []),
 
-window.QRScanner.scan = (callback) => {
-  if (!callback) throw new Error("No callback provided to scan method.");
-  const success = (result) => callback(null, result);
-  cordova.exec(success, errorCallback(callback), "QRScanner", "scan", []);
-};
+  show: (callback) =>
+    cordova.exec(doneCallback(callback, true), null, "QRScanner", "show", []),
 
-window.QRScanner.cancelScan = (callback) =>
-  cordova.exec(doneCallback(callback), null, "QRScanner", "cancelScan", []);
+  hide: (callback) =>
+    cordova.exec(doneCallback(callback, true), null, "QRScanner", "hide", []),
 
-window.QRScanner.show = (callback) =>
-  cordova.exec(doneCallback(callback, true), null, "QRScanner", "show", []);
+  pausePreview: (callback) =>
+    cordova.exec(doneCallback(callback), null, "QRScanner", "pausePreview", []),
 
-window.QRScanner.hide = (callback) =>
-  cordova.exec(doneCallback(callback, true), null, "QRScanner", "hide", []);
+  resumePreview: (callback) =>
+    cordova.exec(
+      doneCallback(callback),
+      null,
+      "QRScanner",
+      "resumePreview",
+      []
+    ),
 
-window.QRScanner.pausePreview = (callback) =>
-  cordova.exec(doneCallback(callback), null, "QRScanner", "pausePreview", []);
+  enableLight: (callback) =>
+    cordova.exec(
+      successCallback(callback),
+      errorCallback(callback),
+      "QRScanner",
+      "enableLight",
+      []
+    ),
 
-window.QRScanner.resumePreview = (callback) =>
-  cordova.exec(doneCallback(callback), null, "QRScanner", "resumePreview", []);
+  disableLight: (callback) =>
+    cordova.exec(
+      successCallback(callback),
+      errorCallback(callback),
+      "QRScanner",
+      "disableLight",
+      []
+    ),
 
-window.QRScanner.enableLight = (callback) =>
-  cordova.exec(
-    successCallback(callback),
-    errorCallback(callback),
-    "QRScanner",
-    "enableLight",
-    []
-  );
+  useCamera: (index, callback) =>
+    cordova.exec(
+      successCallback(callback),
+      errorCallback(callback),
+      "QRScanner",
+      "useCamera",
+      [index]
+    ),
 
-window.QRScanner.disableLight = (callback) =>
-  cordova.exec(
-    successCallback(callback),
-    errorCallback(callback),
-    "QRScanner",
-    "disableLight",
-    []
-  );
+  useFrontCamera: (callback) => window.QRScanner.useCamera(1, callback),
 
-window.QRScanner.useCamera = (index, callback) =>
-  cordova.exec(
-    successCallback(callback),
-    errorCallback(callback),
-    "QRScanner",
-    "useCamera",
-    [index]
-  );
+  useBackCamera: (callback) => window.QRScanner.useCamera(0, callback),
 
-window.QRScanner.useFrontCamera = (callback) =>
-  window.QRScanner.useCamera(1, callback);
+  openSettings: (callback) =>
+    cordova.exec(
+      successCallback(callback),
+      errorCallback(callback),
+      "QRScanner",
+      "openSettings",
+      []
+    ),
 
-window.QRScanner.useBackCamera = (callback) =>
-  window.QRScanner.useCamera(0, callback);
-
-window.QRScanner.openSettings = (callback) =>
-  cordova.exec(
-    successCallback(callback),
-    errorCallback(callback),
-    "QRScanner",
-    "openSettings",
-    []
-  );
-
-window.QRScanner.getStatus = (callback) => {
-  if (!callback) throw new Error("No callback provided to getStatus method.");
-  cordova.exec(doneCallback(callback), null, "QRScanner", "getStatus", []);
+  getStatus: (callback) => {
+    if (!callback) throw new Error("No callback provided to getStatus method.");
+    cordova.exec(doneCallback(callback), null, "QRScanner", "getStatus", []);
+  },
 };
