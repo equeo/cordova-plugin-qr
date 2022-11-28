@@ -123,7 +123,7 @@ const doneCallback = (callback, clear) => {
   };
 };
 
-window.QRScanner = {
+const QRScanner = {
   prepare: (callback) =>
     cordova.exec(
       successCallback(callback),
@@ -214,3 +214,7 @@ window.QRScanner = {
     cordova.exec(doneCallback(callback), null, "QRScanner", "getStatus", []);
   },
 };
+
+window.QRScanner = QRScanner;
+
+export default QRScanner;
