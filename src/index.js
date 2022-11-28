@@ -215,6 +215,4 @@ const QRScanner = {
   },
 };
 
-console.log(QRScanner)
-
-window.QRScanner = QRScanner;
+Object.assign(window.QRScanner, QRScanner);

@@ -6,5 +6,7 @@ export default {
     file: "dist/index.js",
     format: "es",
   },
-  plugins: [babel({ babelHelpers: "bundled", minified: true })],
+  plugins: [
+    babel({ babelHelpers: "bundled", minified: true, comments: false }),
+  ],
 };
