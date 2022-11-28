@@ -123,6 +123,8 @@ const doneCallback = (callback, clear) => {
   };
 };
 
+window.QRScanner = {};
+
 window.QRScanner.prepare = (callback) =>
   cordova.exec(
     successCallback(callback),
