@@ -115,6 +115,7 @@ const successCallback = (callback) => {
 const doneCallback = (callback, clear) => {
   if (!callback) return null;
   return (statusDict) => {
+    if (clear) clearBackground();
     return callback(convertStatus(statusDict));
   };
 };
