@@ -5,7 +5,7 @@
   <engines>
     <engine name="cordova" version=">=3.4.0"/>
   </engines>
-  <js-module src="www/www.min.js" name="QRScanner">
+  <js-module src="dist/index.js" name="QRScanner">
     <clobbers target="QRScanner" />
   </js-module>
   <platform name="android">
@@ -33,35 +33,5 @@
     <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
       <string>The camera is used to scan QR codes.</string>
     </config-file>
-  </platform>
-  <platform name="browser">
-    <config-file target="config.xml" parent="/*">
-      <feature name="QRScanner">
-        <param name="browser-package" value="QRScanner" />
-      </feature>
-    </config-file>
-    <js-module src="src/browser/plugin.min.js" name="QRScannerProxy">
-      <runs />
-    </js-module>
-  </platform>
-  <platform name="windows">
-    <config-file target="config.xml" parent="/*">
-      <feature name="QRScanner">
-        <param name="windows-package" value="QRScanner" />
-      </feature>
-    </config-file>
-    <config-file target="package.appxmanifest" parent="/Package/Capabilities">
-      <DeviceCapability Name="webcam" />
-    </config-file>
-    <js-module src="src/windows/lib/qrScanner.js" name="qrScanner">
-      <runs/>
-    </js-module>
-    <js-module src="src/windows/lib/preview.js" name="preview">
-      <runs/>
-    </js-module>
-    <framework src="src/windows/QRReader/QRReader.csproj" custom="true" type="projectReference"/>
-    <asset src="src/windows/lib/preview.css" target="css/plugin-qrscanner-preview.css" />
-    <hook src="hooks/windows/check-arch.js" type="before_compile" />
-    <hook src="hooks/windows/check-arch.js" type="before_run" />
   </platform>
 </plugin>
