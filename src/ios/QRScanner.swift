@@ -5,47 +5,63 @@ import AVFoundation
 class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
     
     class CameraView: UIView {
-        var videoPreviewLayer:AVCaptureVideoPreviewLayer?
-        
-        func interfaceOrientationToVideoOrientation(_ orientation : UIInterfaceOrientation) -> AVCaptureVideoOrientation {
-            switch (orientation) {
-            case UIInterfaceOrientation.portrait:
-                return AVCaptureVideoOrientation.portrait;
-            case UIInterfaceOrientation.portraitUpsideDown:
-                return AVCaptureVideoOrientation.portraitUpsideDown;
-            case UIInterfaceOrientation.landscapeLeft:
-                return AVCaptureVideoOrientation.landscapeLeft;
-            case UIInterfaceOrientation.landscapeRight:
-                return AVCaptureVideoOrientation.landscapeRight;
+
+        var videoPreviewLayer: AVCaptureVideoPreviewLayer?
+
+        // MARK: - Orientation mapping
+
+        func interfaceOrientationToVideoOrientation(_ orientation: UIInterfaceOrientation) -> AVCaptureVideoOrientation {
+            switch orientation {
+            case .portrait:
+                return .portrait
+            case .portraitUpsideDown:
+                return .portraitUpsideDown
+            case .landscapeLeft:
+                return .landscapeLeft
+            case .landscapeRight:
+                return .landscapeRight
             default:
-                return AVCaptureVideoOrientation.portraitUpsideDown;
+                return .portrait
             }
         }
 
+        // MARK: - Layout
+
         override func layoutSubviews() {
-            super.layoutSubviews();
+            super.layoutSubviews()
+
+            // Ensure all sublayers resize with view
             if let sublayers = self.layer.sublayers {
                 for layer in sublayers {
-                    layer.frame = self.bounds;
+                    layer.frame = self.bounds
                 }
             }
-            
-            self.videoPreviewLayer?.connection?.videoOrientation = interfaceOrientationToVideoOrientation(UIApplication.shared.statusBarOrientation);
-        }
-        
-        
-        func addPreviewLayer(_ previewLayer:AVCaptureVideoPreviewLayer?) {
-            previewLayer!.videoGravity = AVLayerVideoGravity.resizeAspectFill
-            previewLayer!.frame = self.bounds
-            self.layer.addSublayer(previewLayer!)
-            self.videoPreviewLayer = previewLayer;
-        }
-        
-        func removePreviewLayer() {
-            if self.videoPreviewLayer != nil {
-                self.videoPreviewLayer!.removeFromSuperlayer()
-                self.videoPreviewLayer = nil
+
+            if let connection = videoPreviewLayer?.connection,
+               let orientation = self.window?.windowScene?.interfaceOrientation {
+
+                connection.videoOrientation =
+                    interfaceOrientationToVideoOrientation(orientation)
             }
+
+            videoPreviewLayer?.frame = self.bounds
+        }
+
+        // MARK: - Preview layer handling
+
+        func addPreviewLayer(_ previewLayer: AVCaptureVideoPreviewLayer?) {
+            guard let previewLayer = previewLayer else { return }
+
+            previewLayer.videoGravity = .resizeAspectFill
+            previewLayer.frame = self.bounds
+
+            self.layer.addSublayer(previewLayer)
+            self.videoPreviewLayer = previewLayer
+        }
+
+        func removePreviewLayer() {
+            videoPreviewLayer?.removeFromSuperlayer()
+            videoPreviewLayer = nil
         }
     }
 
@@ -92,7 +108,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
     }
 
     func sendErrorCode(command: CDVInvokedUrlCommand, error: QRScannerError){
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: error.rawValue)
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus.error, messageAs: error.rawValue)
         commandDelegate!.send(pluginResult, callbackId:command.callbackId)
     }
 
@@ -133,15 +149,18 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             if (captureSession?.isRunning != true){
                 cameraView.backgroundColor = UIColor.clear
                 self.webView!.superview!.insertSubview(cameraView, belowSubview: self.webView!)
-                let availableVideoDevices =  AVCaptureDevice.devices(for: AVMediaType.video)
-                for device in availableVideoDevices {
-                    if device.position == AVCaptureDevice.Position.back {
-                        backCamera = device
-                    }
-                    else if device.position == AVCaptureDevice.Position.front {
-                        frontCamera = device
-                    }
-                }
+                let discoverySession = AVCaptureDevice.DiscoverySession(
+                    deviceTypes: [
+                        .builtInWideAngleCamera,
+                        .builtInDualCamera,
+                        .builtInTripleCamera
+                    ],
+                    mediaType: .video,
+                    position: .unspecified
+                )
+                let availableVideoDevices = discoverySession.devices
+                backCamera = discoverySession.devices.first { $0.position == .back }
+                frontCamera = discoverySession.devices.first { $0.position == .front }
                 // older iPods have no back camera
                 if(backCamera == nil){
                     currentCamera = 1
@@ -240,8 +259,9 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
         let found = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
         if found.type == AVMetadataObject.ObjectType.qr && found.stringValue != nil {
             scanning = false
-            let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: found.stringValue)
-            commandDelegate!.send(pluginResult, callbackId: nextScanningCommand?.callbackId!)
+            let pluginResult = CDVPluginResult(status: CDVCommandStatus.ok, messageAs: found.stringValue!)
+            let nextCallbackId = nextScanningCommand!.callbackId!
+            commandDelegate!.send(pluginResult, callbackId: nextCallbackId)
             nextScanningCommand = nil
         }
     }
@@ -462,13 +482,13 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             "currentCamera": String(currentCamera)
         ]
 
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: status)
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus.ok, messageAs: status)
         commandDelegate!.send(pluginResult, callbackId:command.callbackId)
     }
 
     @objc func openSettings(_ command: CDVInvokedUrlCommand) {
         if #available(iOS 10.0, *) {
-            guard let settingsUrl = URL(string: UIApplicationOpenSettingsURLString) else {
+            guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
             return
         }
         if UIApplication.shared.canOpenURL(settingsUrl) {
@@ -479,13 +499,8 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             self.sendErrorCode(command: command, error: QRScannerError.open_settings_unavailable)
             }
         } else {
-            // pre iOS 10.0
-            if #available(iOS 8.0, *) {
-                UIApplication.shared.openURL(NSURL(string: UIApplicationOpenSettingsURLString)! as URL)
-                self.getStatus(command)
-            } else {
-                self.sendErrorCode(command: command, error: QRScannerError.open_settings_unavailable)
-            }
+            UIApplication.shared.openURL(NSURL(string: UIApplication.openSettingsURLString)! as URL)
+            self.getStatus(command)
         }
     }
 }
